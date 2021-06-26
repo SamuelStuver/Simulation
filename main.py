@@ -1,4 +1,4 @@
-from things import Dot, Color
+from things import Dot, Color, LifeMatrix
 import sys
 import time
 import random
@@ -28,6 +28,10 @@ class Simulation:
     def screen_height(self):
         return self.screen.get_height()
 
+    def initialize_objects(self):
+        for obj in self.objects:
+            obj.initialize()
+
     def run(self):
         print(f"Running Simulation: {self.name}")
         while True:
@@ -35,9 +39,8 @@ class Simulation:
                 if event.type == pygame.QUIT: sys.exit()
 
             for obj in self.objects:
-                obj.draw(self)
-                # obj.move_by([0.01, 0.01])
-                obj.random_walk(max_distance=0.01)
+                obj.draw_to_screen(self)
+                obj.step(delay=None)
 
             self.update(leave_trace=False)
 
@@ -51,10 +54,15 @@ class Simulation:
 
 
 if __name__ == "__main__":
+    x_size = 1000
+    y_size = 1000
+    pixel_ratio = 5
     name = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else ""
-    sim = Simulation(name, pixel_width=1000, pixel_height=1000)
-    for i in range(1000):
-        sim.add_object(Dot(color=(random.uniform(50,255), random.uniform(50,255), random.uniform(50,255))))
+    sim = Simulation(name, pixel_width=x_size, pixel_height=y_size)
+    sim.add_object(LifeMatrix(int(x_size/pixel_ratio), int(y_size/pixel_ratio), pixel_ratio))
+    sim.initialize_objects()
+    # for i in range(1000):
+    #     sim.add_object(Dot(color=(random.uniform(50,255), random.uniform(50,255), random.uniform(50,255))))
 
     sim.run()
 
